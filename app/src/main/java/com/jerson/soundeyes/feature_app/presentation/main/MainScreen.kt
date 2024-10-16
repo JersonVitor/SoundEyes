@@ -50,18 +50,13 @@ fun MainScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
-            Button(onClick = { navController.navigate("cameraScreen/yoloClassifierScreen"){
+            Button(onClick = { navController.navigate(Route.YoloClassifierScreen.route){
                 popUpTo(navController.graph.startDestinationId)
                 launchSingleTop = true
             } }) {
                 Text(text = "Yolo")
             }
-            Button(onClick = { navController.navigate("cameraScreen/mobileNetScreen"){
-                popUpTo(navController.graph.startDestinationId)
-                launchSingleTop = true
-            } }) {
-                Text(text = "MobileNet")
-            }
+
 
         }
     }

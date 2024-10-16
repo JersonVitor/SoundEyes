@@ -16,9 +16,8 @@ fun NavGraph(navHostController: NavHostController) {
     NavHost(navController = navHostController, startDestination = Route.MainScreen.route) {
         composable(Route.MainScreen.route) {MainScreen(navController = navHostController) }
 
-        composable(Route.YoloClassifierScreen.route) { backStackEntry ->
-            val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
-            YoloClassifierScreen(navHostController,imageUri = Uri.decode(imageUri))}
+        composable(Route.YoloClassifierScreen.route) {
+            YoloClassifierScreen(navHostController)}
 
         composable(Route.MobileNetScreen.route) { backStackEntry ->
             val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""

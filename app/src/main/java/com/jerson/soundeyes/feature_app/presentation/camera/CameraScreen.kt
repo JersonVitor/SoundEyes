@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.jerson.soundeyes.feature_app.presentation.main.BackgroundCameraCapture
 
 
 @Composable
@@ -25,30 +26,11 @@ fun CameraScreen(
     navController: NavController,
                  destination: String) {
 
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val context = LocalContext.current
+   BackgroundCameraCapture(
+       frameRate = 10,
+       onImageCaptured = {
 
-
-    // Launcher para tirar a foto
-    val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        if (bitmap != null) {
-            val uri = saveImageToExternalStorage(context, bitmap)
-            imageUri = uri
-
-        }
-    }
-    LaunchedEffect(Unit) {
-        takePictureLauncher.launch()
-    }
-
-    if (imageUri != null) {
-        navController.navigate("$destination/${Uri.encode(imageUri.toString())}"){
-            popUpTo(navController.graph.startDestinationId)
-            launchSingleTop = true
-        }
-    }
+       })
 }
 
 private fun saveImageToExternalStorage(context: Context, bitmap: Bitmap): Uri? {

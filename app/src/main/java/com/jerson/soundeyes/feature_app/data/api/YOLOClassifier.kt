@@ -1,8 +1,11 @@
 package com.jerson.soundeyes.feature_app.data.api
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.*
+import android.net.Uri
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import com.jerson.soundeyes.feature_app.domain.model.DetectionResult
 import org.tensorflow.lite.Interpreter
@@ -62,7 +65,7 @@ object YOLOClassifier {
 
         // Desenhar caixas delimitadoras e salvar a imagem
         val bitmapWithBoxes = drawDetectionBoxes(resizedBitmap, detectionResults)
-        saveImageToInternalStorage(appContext, bitmapWithBoxes)
+        saveImageToExternalStorage(appContext, bitmapWithBoxes)
 
         return detectionResults
     }
@@ -76,7 +79,7 @@ object YOLOClassifier {
             val confidence = detection[4] // Índice 4 contém a confiança do objeto
 
             // Verifica se a confiança excede o limiar definido (por exemplo, 0.5)
-            if (confidence > 0.2) {
+            if (confidence > 0.5) {
                 // Extraindo as coordenadas da caixa delimitadora
                 val x = detection[0]
                 val y = detection[1]
@@ -94,7 +97,7 @@ object YOLOClassifier {
         return results
     }
 
-// Função auxiliar para desenhar as caixas delimitadoras
+/*// Função auxiliar para desenhar as caixas delimitadoras
     private fun drawDetectionBoxes(bitmap: Bitmap, detectionResults: List<DetectionResult>): Bitmap {
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(mutableBitmap)
@@ -123,10 +126,97 @@ object YOLOClassifier {
         }
 
         return mutableBitmap
+    }*/
+private fun drawDetectionBoxes(bitmap: Bitmap, detectionResults: List<DetectionResult>): Bitmap {
+    val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+    val canvas = Canvas(mutableBitmap)
+    val paintBox = Paint().apply {
+        color = Color.RED
+        style = Paint.Style.STROKE
+        strokeWidth = 4f
+    }
+    val paintText = Paint().apply {
+        color = Color.WHITE
+        textSize = 40f
+        style = Paint.Style.FILL
+    }
+    val paintBackground = Paint().apply {
+        color = Color.BLACK
+        alpha = 150
+    }
+
+    // Itera sobre os resultados da detecção
+    detectionResults.forEach { result ->
+        // As coordenadas (x, y, width, height) estão normalizadas entre 0 e 1, então precisamos escalá-las
+        val xCenter = result.x * bitmap.width
+        val yCenter = result.y * bitmap.height
+        val boxWidth = result.width * bitmap.width
+        val boxHeight = result.height * bitmap.height
+
+        // Calcula as coordenadas dos cantos da caixa
+        val left = xCenter - boxWidth / 2
+        val top = yCenter - boxHeight / 2
+        val right = xCenter + boxWidth / 2
+        val bottom = yCenter + boxHeight / 2
+
+        // Desenha a caixa delimitadora na imagem
+        canvas.drawRect(left, top, right, bottom, paintBox)
+
+        // Prepara o texto com o rótulo e a confiança
+        val labelText = "${result.classId} - ${"%.2f".format(result.confidence)}"
+
+        // Desenha o fundo preto para o texto
+        val textWidth = paintText.measureText(labelText)
+        val textHeight = paintText.textSize
+        canvas.drawRect(left, top - textHeight, left + textWidth, top, paintBackground)
+
+        // Desenha o texto na imagem (rótulo + confiança)
+        canvas.drawText(labelText, left, top - 10, paintText)
+    }
+
+    return mutableBitmap
+}
+
+
+    private fun saveImageToExternalStorage(context: Context, bitmap: Bitmap) {
+        val filename = "detected_image_${System.currentTimeMillis()}.png"
+        val resolver = context.contentResolver
+
+        // Definir o local no MediaStore (Imagens)
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/DetectedImages") // Pasta dentro da galeria
+            put(MediaStore.Images.Media.IS_PENDING, 1)  // Coloca a imagem em estado "pendente"
+        }
+
+        // Inserir a imagem no MediaStore
+        val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+        imageUri?.let { uri ->
+            try {
+                // Abrir o output stream para salvar a imagem
+                resolver.openOutputStream(uri)?.use { outStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream)
+                }
+
+                // Atualiza o estado "pendente" da imagem para concluída
+                contentValues.clear()
+                contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                resolver.update(uri, contentValues, null, null)
+
+                Log.d("Save Image", "Image saved successfully: $uri")
+
+            } catch (e: IOException) {
+                Log.e("Save Image", "Error saving image", e)
+            }
+        } ?: run {
+            Log.e("Save Image", "Error: Image Uri is null")
+        }
     }
 
     // Função auxiliar para salvar a imagem no armazenamento interno
-    private fun saveImageToInternalStorage(context: Context, bitmap: Bitmap) {
+   /* private fun saveImageToInternalStorage(context: Context, bitmap: Bitmap) {
         val directory = context.filesDir // Use internal storage directory
         val file = File(directory, "detected_image.png")
         try {
@@ -138,7 +228,7 @@ object YOLOClassifier {
             Log.e("Save Image", "Error saving image", e)
         }
     }
-
+*/
 
     // Função auxiliar para encontrar o índice do valor máximo
     private fun FloatArray.indexOfMax(): Int {

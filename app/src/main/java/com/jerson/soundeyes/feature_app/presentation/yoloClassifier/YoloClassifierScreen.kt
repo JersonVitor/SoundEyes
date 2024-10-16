@@ -17,13 +17,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.jerson.soundeyes.feature_app.presentation.main.BackgroundCameraCapture
 
 
 @Composable
@@ -31,49 +34,53 @@ fun YoloClassifierScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: YoloClassifierViewModel = hiltViewModel(),
-    imageUri: String
+
 ) {
     val state by viewModel.state
-    // Carregar o Bitmap a partir da URI
-    val context = LocalContext.current
-    val bitmap = remember(imageUri) {
-        loadBitmapFromUri(context, imageUri)
-    }
+    var bitmapState by remember{ mutableStateOf<Bitmap?>(null)}
+    BackgroundCameraCapture(
+        frameRate = 30,
+        onImageCaptured = {bp->
+            bitmapState = bp
+        })
 
-    LaunchedEffect(bitmap) {
-        bitmap?.let {
+
+    LaunchedEffect(bitmapState) {
+        bitmapState?.let {
             viewModel.onEvent(YoloEvent.ClassifyImage(it))
         }
     }
     Column(modifier = modifier.padding(16.dp)) {
-        // Exibir a imagem
+        // Exibir a imagem capturada
+        bitmapState?.let { bitmap ->
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = "Captured Image",
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-       Image(bitmap = bitmap!!.asImageBitmap(), contentDescription = "Classify Image", modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Exibir os resultados da classificação
+        // Exibir os resultados da classificação do YOLO
         if (state.result.isNotEmpty()) {
             LazyColumn {
                 items(state.result.size) { index ->
                     val detection = state.result[index]
                     val label = if (detection.classId < state.labels.size) state.labels[detection.classId] else "Unknown"
-                    Text(text = "Label: $label, Confidence: ${detection.confidence}, Box: (${detection.x}, ${detection.y}, ${detection.width}, ${detection.height})")
+                    Text(
+                        text = "Label: $label, Confidence: ${detection.confidence}, Box: (${detection.x}, ${detection.y}, ${detection.width}, ${detection.height})"
+                    )
                 }
             }
         } else {
             Text(text = "No detections found.")
         }
     }
+
+    // Gerenciar o botão de voltar para a navegação
     BackHandler {
         navController.popBackStack()
     }
 }
-private fun loadBitmapFromUri(context: Context, uri: String): Bitmap? {
-    return try {
-        val inputStream = context.contentResolver.openInputStream(Uri.parse(uri))
-        BitmapFactory.decodeStream(inputStream)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-}
+
