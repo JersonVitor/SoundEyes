@@ -71,6 +71,7 @@ object YOLOClassifier {
             tensorHeight = inputShape[2]
             numChannel = outputShape[1]
             numElements = outputShape[2]
+            Log.d("DEBUG",outputShape.toString())
             carregaLabels()
         }
 
