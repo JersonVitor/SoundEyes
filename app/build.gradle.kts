@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.jerson.soundeyes"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.jerson.soundeyes"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation("androidx.core:core-ktx:+")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -70,8 +71,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //tensorFlow
-    implementation ("org.tensorflow:tensorflow-lite:2.9.0")
+    implementation ("org.tensorflow:tensorflow-lite:2.11.0")
     implementation ("org.tensorflow:tensorflow-lite-support:0.3.1")
+    implementation ("org.tensorflow:tensorflow-lite-gpu:2.11.0")
+    implementation ("org.tensorflow:tensorflow-lite-gpu-api:2.11.0")
 
 
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")

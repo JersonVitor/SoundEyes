@@ -31,8 +31,7 @@ import com.jerson.soundeyes.ui.theme.SoundEyesTheme
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
-    mainViewModel: MainViewModel = hiltViewModel()
+    navController: NavHostController
 ) {
 
     var onPermissionGranted by remember{ mutableStateOf( false) }
@@ -50,18 +49,13 @@ fun MainScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
-            Button(onClick = { navController.navigate("cameraScreen/yoloClassifierScreen"){
+            Button(onClick = { navController.navigate(Route.YoloClassifierScreen.route){
                 popUpTo(navController.graph.startDestinationId)
                 launchSingleTop = true
             } }) {
                 Text(text = "Yolo")
             }
-            Button(onClick = { navController.navigate("cameraScreen/mobileNetScreen"){
-                popUpTo(navController.graph.startDestinationId)
-                launchSingleTop = true
-            } }) {
-                Text(text = "MobileNet")
-            }
+
 
         }
     }

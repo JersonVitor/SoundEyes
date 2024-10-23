@@ -26,13 +26,6 @@ class YoloClassifierViewModel @Inject constructor(
     private val _state = mutableStateOf(YoloState())
     val state: State<YoloState> = _state
 
-    init {
-        _state.value = _state.value.copy(
-            labels = Util.loadLabels(context, Const.LABELS_YOLO)
-        )
-    }
-
-
 
 
     fun onEvent(event: YoloEvent) {
@@ -44,6 +37,7 @@ class YoloClassifierViewModel @Inject constructor(
                     )
                 }
             }
+
         }
     }
 
