@@ -24,30 +24,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
-
-
 @Composable
 fun YoloClassifierScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: YoloClassifierViewModel = hiltViewModel(),
-
 ) {
     val state by viewModel.state
-    var bitmapState by remember{ mutableStateOf<Bitmap?>(null)}
-
-
+    var bitmapState by remember { mutableStateOf<Bitmap?>(null) }
+    var classificationTime by remember { mutableStateOf("") } // Variável para armazenar o tempo de classificação
 
     LaunchedEffect(bitmapState) {
         bitmapState?.let {
+            val startTime = System.currentTimeMillis() // Marcar o tempo de início
             viewModel.onEvent(YoloEvent.ClassifyImage(it))
+            val endTime = System.currentTimeMillis() // Marcar o tempo de fim
+            classificationTime = "${endTime - startTime} ms" // Calcular o tempo gasto
         }
     }
 
@@ -64,40 +65,19 @@ fun YoloClassifierScreen(
                 modifier = Modifier.fillMaxSize()
             )
         }
+
+        // Exibir o tempo de classificação no canto superior direito
+        Text(
+            text = classificationTime,
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.TopEnd), // Posiciona no canto superior direito
+            color = Color.White // Ou a cor que preferir
+        )
     }
-
-
-    /* Column(modifier = modifier.padding(16.dp)) {
-         // Exibir a imagem capturada
-         bitmapState?.let { bitmap ->
-             Image(
-                 bitmap = bitmap.asImageBitmap(),
-                 contentDescription = "Captured Image",
-                 modifier = Modifier.fillMaxWidth()
-             )
-         }
-
-         Spacer(modifier = Modifier.height(16.dp))
-
-         // Exibir os resultados da classificação do YOLO
-         if (state.result.isNotEmpty()) {
-             LazyColumn {
-                 items(state.result.size) { index ->
-                     val detection = state.result[index]
-                     val label = if (detection.classId < state.labels.size) state.labels[detection.classId] else "Unknown"
-                     Text(
-                         text = "Label: $label, Confidence: ${detection.confidence}, Box: (${detection.x}, ${detection.y}, ${detection.width}, ${detection.height})"
-                     )
-                 }
-             }
-         } else {
-             Text(text = "No detections found.")
-         }
-     }*/
 
     // Gerenciar o botão de voltar para a navegação
     BackHandler {
         navController.popBackStack()
     }
 }
-

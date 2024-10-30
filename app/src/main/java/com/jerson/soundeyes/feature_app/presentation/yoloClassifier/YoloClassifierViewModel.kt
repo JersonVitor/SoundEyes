@@ -14,7 +14,9 @@ import com.jerson.soundeyes.feature_app.domain.use_case.CloseClassifierUseCase
 import com.jerson.soundeyes.feature_app.presentation.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,6 +37,11 @@ class YoloClassifierViewModel @Inject constructor(
                     _state.value = _state.value.copy(
                         result = yoloClassifierUseCase.invoke(event.bitmap) // Usa o bitmap do evento
                     )
+                }
+            }
+            is YoloEvent.CloseYolo -> {
+                viewModelScope.launch {
+                    closeClassifierUseCase.invoke()
                 }
             }
 
