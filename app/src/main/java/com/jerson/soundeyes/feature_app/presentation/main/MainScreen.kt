@@ -9,23 +9,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.jerson.soundeyes.feature_app.camera.CameraPermissionRequest
-import com.jerson.soundeyes.feature_app.presentation.navGraph.NavGraph
+import com.jerson.soundeyes.feature_app.camera.PermissionsRequest
 import com.jerson.soundeyes.feature_app.presentation.navGraph.Route
-import com.jerson.soundeyes.ui.theme.SoundEyesTheme
+
 
 
 @Composable
@@ -36,7 +29,8 @@ fun MainScreen(
 
     var onPermissionGranted by remember{ mutableStateOf( false) }
 
-    CameraPermissionRequest {
+
+    PermissionsRequest {
         onPermissionGranted = true
     }
     Surface(modifier = modifier
