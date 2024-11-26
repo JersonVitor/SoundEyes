@@ -188,7 +188,8 @@ object YOLOClassifier {
 
         // Aplicar NMS (Non-Maximum Suppression) para remover caixas sobrepostas
         return applyNMS(boundingBoxes)
-    }*/
+    }
+    */
 
 
     private fun bestBox(array: FloatArray, imageArea: Int) : List<BoundingBox>? {

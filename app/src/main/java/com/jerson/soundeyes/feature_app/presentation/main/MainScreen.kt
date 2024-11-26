@@ -1,5 +1,6 @@
 package com.jerson.soundeyes.feature_app.presentation.main
 
+import PermissionsRequest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.jerson.soundeyes.feature_app.camera.PermissionsRequest
+
 import com.jerson.soundeyes.feature_app.presentation.navGraph.Route
 
 

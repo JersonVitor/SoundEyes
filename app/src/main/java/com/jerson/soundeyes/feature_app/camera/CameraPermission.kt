@@ -1,5 +1,3 @@
-package com.jerson.soundeyes.feature_app.camera
-
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -93,7 +91,8 @@ private fun checkPermissions(context: Context): Boolean {
         Manifest.permission.BLUETOOTH,
         Manifest.permission.BLUETOOTH_ADMIN,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_SCAN else null,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_CONNECT else null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_CONNECT else null,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) Manifest.permission.ACCESS_FINE_LOCATION else null // Necessária para Bluetooth em versões anteriores a S
     ).all { permission ->
         permission == null || ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
     }
@@ -111,6 +110,8 @@ private fun getPermissionsToRequest(): Array<String> {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         permissions.add(Manifest.permission.BLUETOOTH_SCAN)
         permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+    } else {
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION) // Necessária para Bluetooth em versões anteriores a S
     }
     return permissions.toTypedArray()
 }
