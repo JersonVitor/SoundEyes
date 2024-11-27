@@ -13,7 +13,7 @@ import com.jerson.soundeyes.feature_app.presentation.main.MainScreen
 fun NavGraph(navHostController: NavHostController) {
 
     NavHost(navController = navHostController, startDestination = Route.MainScreen.route) {
-        composable(Route.MainScreen.route) {MainScreen(navController = navHostController) }
+       composable(Route.MainScreen.route) {MainScreen(navController = navHostController) }
 
         composable(Route.YoloClassifierScreen.route) {
             YoloClassifierScreen(navHostController)}

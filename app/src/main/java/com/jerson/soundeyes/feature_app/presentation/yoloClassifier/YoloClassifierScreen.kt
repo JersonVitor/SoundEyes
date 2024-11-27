@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 
 @Composable
 fun YoloClassifierScreen(
@@ -48,10 +50,29 @@ fun YoloClassifierScreen(
     var classificationTime by remember { mutableStateOf("") } // Variável para armazenar o tempo de classificação
     var sendingImage by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        while (true) {
+        flow {
+            while (true) {
+                emit(Unit)
+            }
+        }.collect{
             try {
-                /*ConectionBluetooth.envioBool(context,true)
-                // Recebe a imagem do ESP32*/
+                //ConectionBluetooth.envioBool(context,true)
+                // Recebe a imagem do ESP32
+                val startTime = System.currentTimeMillis() // Marcar
+                val receivedImage = receiveImageFromESP32(context)
+                val endTime = System.currentTimeMillis()
+                receivedImage?.let {
+                    bitmapState = it
+                }
+                sendingImage = "${endTime - startTime} ms"
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
+       /* while (true) {
+            try {
+                *//*ConectionBluetooth.envioBool(context,true)
+                // Recebe a imagem do ESP32*//*
                 val startTime = System.currentTimeMillis() // Marcar
               val receivedImage = receiveImageFromESP32(context)
                 val endTime = System.currentTimeMillis()
@@ -63,7 +84,7 @@ fun YoloClassifierScreen(
             } catch (e: Exception) {
                 e.printStackTrace() // Lidar com erros de conexão ou outros problemas
             }
-        }
+        }*/
     }
     LaunchedEffect(bitmapState) {
         bitmapState?.let {
@@ -75,8 +96,8 @@ fun YoloClassifierScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-      /*  // Visualização da câmera
-        CameraPreviewView(modifier = Modifier.fillMaxSize(), processImage = {
+
+        /*CameraPreviewView(modifier = Modifier.fillMaxSize(), processImage = {
             bitmapState = it
         })*/
        bitmapState?.let { Image(bitmap = it.asImageBitmap(),
