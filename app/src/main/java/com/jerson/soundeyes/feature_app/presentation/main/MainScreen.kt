@@ -36,10 +36,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.jerson.soundeyes.R
 import com.jerson.soundeyes.feature_app.presentation.navGraph.Route
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 
 
 @Composable
@@ -136,20 +140,25 @@ fun MainScreen(
             }*/
             Spacer(modifier = Modifier.height(20.dp))
             Button(onClick = {
-                coroutineScope.launch {
+                CoroutineScope(Dispatchers.Main).launch {
                     try {
-                        val receivedImage = when(selectOption){
-                            "Velocidade" -> envioConfigCamera(context,2)
-                            "Qualidade" -> envioConfigCamera(context,3)
-                            else -> false
-                        }
-                        Log.d("Config", receivedImage.toString())
-                        if (!receivedImage) {
-                            showErrorPopup = true
-                        } else {
-                            navController.navigate(Route.YoloClassifierScreen.route){
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
+                        when(selectOption) {
+                            "Velocidade" -> {
+                                envioConfigCamera(context, 2) { it: Boolean ->
+                                    if (it) {
+                                        goToScreenView(navController)
+                                    } else {
+                                        showErrorPopup = true
+                                    }
+                                }
+                            }
+
+                            "Qualidade" -> envioConfigCamera(context, 3) { it: Boolean ->
+                                if (it) {
+                                    goToScreenView(navController)
+                                } else {
+                                    showErrorPopup = true
+                                }
                             }
                         }
                     } catch (e: Exception) {
@@ -162,5 +171,12 @@ fun MainScreen(
                 Text(text = "Iniciar")
             }
         }
+    }
+}
+
+fun goToScreenView(navController : NavController){
+    navController.navigate(Route.YoloClassifierScreen.route){
+        popUpTo(navController.graph.startDestinationId)
+        launchSingleTop = true
     }
 }
