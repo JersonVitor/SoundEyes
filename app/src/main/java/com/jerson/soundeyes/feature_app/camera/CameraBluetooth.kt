@@ -120,7 +120,7 @@ object ConectionBluetooth {
     /*suspend fun receiveImageFromESP32(context: Context): Bitmap?{
         return BitmapFactory.decodeResource(context.resources,R.drawable.imagem_teste)
     }*/
-    suspend fun envioConfigCamera(context: Context, value: Int) : Boolean{
+    suspend fun envioConfigCamera(context: Context, value: Int, callback : (Boolean) -> Unit) {
         var socket: BluetoothSocket? = null
         var outputStream: OutputStream? = null
         var resp : Boolean = false
@@ -133,7 +133,7 @@ object ConectionBluetooth {
             // Verificar permissão de conexão Bluetooth
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 Log.d("Bluetooth", "Permissão de conexão Bluetooth não concedida.")
-                return false
+                callback(false)
             }
 
             // Criar e conectar o socket Bluetooth
@@ -148,18 +148,19 @@ object ConectionBluetooth {
 
             // Enviar o valor booleano como 1 ou 0
             withContext(Dispatchers.IO) {
-               // outputStream.write()
+                outputStream.write(value)
                 outputStream.flush()
             }
             val inputStream: InputStream? = socket.inputStream
             var recebido: Int = 0
             if (inputStream != null) {
-                withContext(Dispatchers.IO) {
+                withContext(Dispatchers.Main) {
                     recebido = inputStream.read()
+                    resp = recebido == 1;
+                    callback(resp)
                 }
             }
             socket?.close()
-            resp = recebido == 1
         } catch (e: IOException) {
             Log.d("Bluetooth", "Erro ao conectar ou enviar dados: ${e.message}")
             e.printStackTrace()
@@ -168,13 +169,11 @@ object ConectionBluetooth {
             try {
                 outputStream?.close()
                 socket?.close()
-                resp = false
-
+                callback(false)
             } catch (e: IOException) {
                 Log.d("Bluetooth", "Erro ao fechar o socket ou OutputStream: ${e.message}")
             }
         }
-        return resp
     }
 
 }
