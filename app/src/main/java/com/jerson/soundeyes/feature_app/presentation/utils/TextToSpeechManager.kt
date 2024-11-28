@@ -1,12 +1,10 @@
 package com.jerson.soundeyes.feature_app.presentation.utils
-
-import android.annotation.SuppressLint
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import android.speech.tts.Voice
 import java.util.Locale
 
 
-@SuppressLint("StaticFieldLeak")
 object TextToSpeechManager : TextToSpeech.OnInitListener {
 
     private lateinit var tts: TextToSpeech
@@ -32,6 +30,38 @@ object TextToSpeechManager : TextToSpeech.OnInitListener {
             }
         } else {
             println("TextToSpeech não está pronto.")
+        }
+    }
+
+    fun setLanguage(locale: Locale) {
+        if (isInitialized) {
+            tts.language = locale
+        }
+    }
+
+    fun setSpeechRate(rate: Float) {
+        if (isInitialized) {
+            tts.setSpeechRate(rate)
+        }
+    }
+
+    fun setPitch(pitch: Float) {
+        if (isInitialized) {
+            tts.setPitch(pitch)
+        }
+    }
+
+    fun getAvailableVoices(): List<Voice> {
+        return if (isInitialized) {
+            tts.voices.toList()
+        } else {
+            emptyList()
+        }
+    }
+
+    fun setVoice(voice: Voice) {
+        if (isInitialized) {
+            tts.voice = voice
         }
     }
 

@@ -137,61 +137,6 @@ object YOLOClassifier {
         }
         return bestBoxes
     }
-    /*private fun bestBox(array: FloatArray, imageArea: Int): List<BoundingBox>? {
-        val boundingBoxes = mutableListOf<BoundingBox>()
-
-        // Iterar sobre cada detecção (300 no YOLOv10)
-        for (c in 0 until numElements) {
-            val cx = array[c * numChannel]        // Coordenada x central (posição 0)
-            val cy = array[c * numChannel + 1]    // Coordenada y central (posição 1)
-            val w = array[c * numChannel + 2]     // Largura da caixa (posição 2)
-            val h = array[c * numChannel + 3]     // Altura da caixa (posição 3)
-            val conf = array[c * numChannel + 4]  // Confiança da detecção (posição 4)
-            val classIdx = array[c * numChannel + 5].toInt()  // Índice da classe (posição 5)
-
-            // Verificar se a confiança é maior que o limiar
-            if (conf > CONFIDENCE_THRESHOLD) {
-                val clsName = labels[classIdx]
-
-                // Calcular as coordenadas dos cantos da caixa delimitadora
-                val x1 = cx - (w / 2F)
-                val y1 = cy - (h / 2F)
-                val x2 = cx + (w / 2F)
-                val y2 = cy + (h / 2F)
-
-                // Filtrar caixas fora dos limites da imagem
-                if (x1 < 0F || x1 > 1F) continue
-                if (y1 < 0F || y1 > 1F) continue
-                if (x2 < 0F || x2 > 1F) continue
-                if (y2 < 0F || y2 > 1F) continue
-
-                // Calcular a área da caixa e filtrar caixas pequenas demais
-                val area = w * h * imageArea
-                if (area < imageArea * 0.03f) continue // Ignorar caixas muito pequenas
-
-                // Determine a célula da grade onde o objeto está localizado
-                val (row, col) = getGridPosition(cx, cy)
-
-                // Adicionar caixa ao resultado
-                boundingBoxes.add(
-                    BoundingBox(
-                        x1 = x1, y1 = y1, x2 = x2, y2 = y2,
-                        cx = cx, cy = cy, w = w, h = h,
-                        cnf = conf, cls = classIdx, clsName = clsName,
-                        gridRow = row, gridCol = col // Armazena a posição na grade
-                    )
-                )
-            }
-        }
-
-        if (boundingBoxes.isEmpty()) return null
-
-        // Aplicar NMS (Non-Maximum Suppression) para remover caixas sobrepostas
-        return applyNMS(boundingBoxes)
-    }
-    */
-
-
     private fun bestBox(array: FloatArray, imageArea: Int) : List<BoundingBox>? {
         val boundingBoxes = mutableListOf<BoundingBox>()
 

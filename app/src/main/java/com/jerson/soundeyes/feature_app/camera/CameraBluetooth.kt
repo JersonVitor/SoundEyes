@@ -8,7 +8,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import com.jerson.soundeyes.R
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -41,7 +43,7 @@ object ConectionBluetooth {
         return withContext(Dispatchers.IO) {
             var socket: BluetoothSocket? = null
             try {
-                val deviceAddress = "2C:BC:BB:84:5C:AA"
+                val deviceAddress = "2C:BC:BB:84:5C:AA" //getPairedDeviceAddress(context)
                 val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
                 val bluetoothAdapter = bluetoothManager.adapter ?: return@withContext null
                 val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress)
@@ -99,12 +101,29 @@ object ConectionBluetooth {
             }
         }
     }
+    suspend fun simulateReceiveImageFromDrawable(context: Context): Bitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Carrega a imagem do drawable
+                val drawableId = R.drawable.image_example2// Substitua pelo nome real da imagem no drawable
+                val inputStream = context.resources.openRawResource(drawableId)
+                delay(100)
+                BitmapFactory.decodeStream(inputStream)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
 
 
-    suspend fun envioBool(context: Context, value: Boolean) {
+    /*suspend fun receiveImageFromESP32(context: Context): Bitmap?{
+        return BitmapFactory.decodeResource(context.resources,R.drawable.imagem_teste)
+    }*/
+    suspend fun envioConfigCamera(context: Context, value: Int) : Boolean{
         var socket: BluetoothSocket? = null
         var outputStream: OutputStream? = null
-
+        var resp : Boolean = false
         try {
             val deviceAddress = "2C:BC:BB:84:5C:AA"
             val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -114,7 +133,7 @@ object ConectionBluetooth {
             // Verificar permissão de conexão Bluetooth
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 Log.d("Bluetooth", "Permissão de conexão Bluetooth não concedida.")
-                return
+                return false
             }
 
             // Criar e conectar o socket Bluetooth
@@ -129,19 +148,18 @@ object ConectionBluetooth {
 
             // Enviar o valor booleano como 1 ou 0
             withContext(Dispatchers.IO) {
-                outputStream.write(if (value) 1 else 0)
+               // outputStream.write()
                 outputStream.flush()
             }
-            Log.d("Bluetooth", "Valor booleano enviado ")
             val inputStream: InputStream? = socket.inputStream
             var recebido: Int = 0
             if (inputStream != null) {
                 withContext(Dispatchers.IO) {
-                   recebido = inputStream.read()
+                    recebido = inputStream.read()
                 }
             }
-            Log.d("Bluetooth", "Valor booleano recebido: $recebido ")
-
+            socket?.close()
+            resp = recebido == 1
         } catch (e: IOException) {
             Log.d("Bluetooth", "Erro ao conectar ou enviar dados: ${e.message}")
             e.printStackTrace()
@@ -150,10 +168,13 @@ object ConectionBluetooth {
             try {
                 outputStream?.close()
                 socket?.close()
+                resp = false
+
             } catch (e: IOException) {
                 Log.d("Bluetooth", "Erro ao fechar o socket ou OutputStream: ${e.message}")
             }
         }
+        return resp
     }
 
 }
