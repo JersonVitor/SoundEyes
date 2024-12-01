@@ -63,7 +63,6 @@ fun MainScreen(
     PermissionsRequest {
         onPermissionGranted = true
     }
-    val coroutineScope = rememberCoroutineScope()
     var showErrorPopup by remember { mutableStateOf(false) }
 
     if (showErrorPopup) {
@@ -147,18 +146,18 @@ fun MainScreen(
                                 envioConfigCamera(context, 2) { it: Boolean ->
                                     if (it) {
                                         goToScreenView(navController)
-                                    } else {
+                                    } /*else {
                                         showErrorPopup = true
-                                    }
+                                    }*/
                                 }
                             }
 
                             "Qualidade" -> envioConfigCamera(context, 3) { it: Boolean ->
                                 if (it) {
                                     goToScreenView(navController)
-                                } else {
+                                } /*else {
                                     showErrorPopup = true
-                                }
+                                }*/
                             }
                         }
                     } catch (e: Exception) {

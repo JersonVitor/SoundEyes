@@ -1,13 +1,15 @@
 package com.jerson.soundeyes.feature_app.presentation.utils
+import android.annotation.SuppressLint
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.Voice
 import java.util.Locale
 
-
+@SuppressLint("StaticFieldLeak")
 object TextToSpeechManager : TextToSpeech.OnInitListener {
 
     private lateinit var tts: TextToSpeech
+
     private lateinit var context: Context
     private var isInitialized: Boolean = false
 
