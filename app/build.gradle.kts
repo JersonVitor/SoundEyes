@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    id ("kotlin-kapt")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
 }
 
@@ -11,15 +12,12 @@ android {
 
     defaultConfig {
         applicationId = "com.jerson.soundeyes"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     buildTypes {
@@ -32,22 +30,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
     }
 }
 
@@ -61,7 +51,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.core:core-ktx:+")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,17 +58,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
     //tensorFlow
-    implementation ("org.tensorflow:tensorflow-lite:2.11.0")
-    implementation ("org.tensorflow:tensorflow-lite-support:0.3.1")
-    implementation ("org.tensorflow:tensorflow-lite-gpu:2.11.0")
-    implementation ("org.tensorflow:tensorflow-lite-gpu-api:2.11.0")
+    implementation (libs.tensorflow.lite)
+    implementation (libs.tensorflow.lite.support)
+    implementation (libs.tensorflow.lite.gpu)
+    implementation (libs.tensorflow.lite.gpu.api)
 
 
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
-    implementation ("androidx.navigation:navigation-compose:2.8.1")
-    implementation ("androidx.compose.material:material-icons-extended:1.7.2")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation (libs.androidx.navigation.compose)
+    implementation (libs.androidx.material.icons.extended)
 
     //Accompanist permissions
     implementation ("com.google.accompanist:accompanist-permissions:0.28.0")
@@ -88,17 +76,15 @@ dependencies {
 
     //Dagger Hilt
     implementation( "com.google.dagger:hilt-android:2.51.1")
-    kapt ("com.google.dagger:hilt-compiler:2.51.1")
+    ksp("com.google.dagger:hilt-compiler:2.51.1")
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 
     //Room
     implementation ("androidx.room:room-runtime:2.6.1")
-    kapt ("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
     implementation ("androidx.room:room-ktx:2.6.1")
 
-    // Kotlin Extensions and Coroutines support for Room
-    implementation ("androidx.room:room-ktx:2.6.1")
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
@@ -108,9 +94,7 @@ dependencies {
     implementation( "androidx.camera:camera-core:1.3.4")
     implementation ("androidx.camera:camera-camera2:1.3.4")
     // CameraX Lifecycle
-   implementation ("androidx.camera:camera-lifecycle:1.3.4")
+    implementation ("androidx.camera:camera-lifecycle:1.3.4")
     // CameraX View
     implementation ("androidx.camera:camera-view:1.3.4")
-    // Para salvar a imagem como arquivo
-   // implementation ("androidx.camera:camera-extensions:1.3.4")
 }
